@@ -37,7 +37,7 @@ datanode={}
 
 def hashing(file_block_no, num_of_datanodes):
 	# return (file_block_no % num_of_datanodes)+1
-hashed_value=file_block_no % num_of_datanodes
+	hashed_value=file_block_no % num_of_datanodes
 	if(datanode[hashed_value+1]>0):
 		return hashed_value+1
 	else:
