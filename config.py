@@ -34,9 +34,10 @@ files_json={}
 
 datanode={}
 
+
 def hashing(file_block_no, num_of_datanodes):
 	# return (file_block_no % num_of_datanodes)+1
-	hashed_value=file_block_no % num_of_datanodes
+hashed_value=file_block_no % num_of_datanodes
 	if(datanode[hashed_value+1]>0):
 		return hashed_value+1
 	else:
@@ -47,12 +48,16 @@ def hashing(file_block_no, num_of_datanodes):
 			return j
 		else:
 			return -1
-# creates direcories which act as datanodes 
-def datanode_creation(num_of_datanode,datanode_size):
-	for data_node_number in range(1,num_of_dnodes+1):
-		os.mkdir('Datanodes/'+str(data_node_number)+"_data_node")
-		datanode[data_node_number]=datanode_size
-datanode_creation(num_of_dnodes,4)  
+
+
+# creates directories which act as datanodes 
+def create_datanodes(num_datanodes,datanode_size):
+	for dnode in range(1,num_datanodes+1):
+		os.mkdir('Datanodes/'+str(dnode)+"_data_node")
+		datanode[dnode]=datanode_size
+
+
+create_datanodes(num_of_dnodes,4)  
 
 # creates a chunk of file
 def split_files(filename, block_size,datanode_size,replication_facor):
@@ -70,6 +75,7 @@ def split_files(filename, block_size,datanode_size,replication_facor):
 		available_blocks=0
 		for key,value in datanode.items():
 			available_blocks+=value
+		if(available_blocks<file_splits):
 		if(available_blocks<file_splits):
 			print('Less blocks available')
 			return
