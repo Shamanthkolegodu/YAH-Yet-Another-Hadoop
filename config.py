@@ -6,30 +6,6 @@ import json
 # os.mkdir('path_to_datanodes') 
 num_of_dnodes=4
 rep_factor = 2
-'''
-json_of_files = {
-	"path/a.txt":{
-		1:{
-			1:1,
-			2:2
-		},
-		2:{
-			2:1,
-			3:1
-		}
-	},
-	"path/b.txt":{
-		1:{
-			1:1,
-			2:2
-		},
-		2:{
-			2:1,
-			3:1
-		}
-	}
-}
-'''
 json_of_files={}
 
 datanode={}
