@@ -5,30 +5,40 @@ import helper
 alive = 1
 # functions
 # hadoop config /Users/shamanthkm/Desktop/config_sample.json
-
+glob_config={}
 
 def hadoop_config(command):
+    global glob_config
     try:
         if(len(command) < 2):
             print('No path specified')
             return None
         else:
             logs = open(command[1])
-            config = json.load(logs)
+            glob_config = json.load(logs)
             helper.create_datanode(
-                config['num_datanodes'], config['datanode_size'], config['path_to_datanodes'])
-            helper.create_namenode(config['path_to_namenodes'])
+                glob_config['num_datanodes'], glob_config['datanode_size'], glob_config['path_to_datanodes'])
+            helper.create_namenode(glob_config['path_to_namenodes'])
     except Exception as e:
         print(e)
         return None
 
 
 def put(command):
-    print(command)
+    try:
+        if(len(command) < 2):
+            print('No path specified')
+            return None
+        else:
+            helper.initial_split(command[1],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"])
+            helper.replicate_files(command[1],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"],glob_config["replication_factor"])
+    except Exception as e:
+        print(e)
+        return None
 
 
 # hadoop config config.js
-print('Entering haddop terminal')
+print('Entering hadoop terminal')
 while(alive):
     try:
         command = input('>')
