@@ -19,6 +19,7 @@ def hadoop_config(command):
             helper.create_datanode(
                 glob_config['num_datanodes'], glob_config['datanode_size'], glob_config['path_to_datanodes'])
             helper.create_namenode(glob_config['path_to_namenodes'])
+            helper.create_logfiles(glob_config['datanode_log_path'],glob_config['num_datanodes'])
     except Exception as e:
         print(e)
         return None
@@ -30,8 +31,8 @@ def put(command):
             print('No path specified')
             return None
         else:
-            helper.initial_split(command[1],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"])
-            helper.replicate_files(command[1],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"],glob_config["replication_factor"])
+            helper.initial_split(command[1],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"],glob_config['datanode_log_path'])
+            helper.replicate_files(command[1],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"],glob_config["replication_factor"],glob_config['datanode_log_path'])
     except Exception as e:
         print(e)
         return None
