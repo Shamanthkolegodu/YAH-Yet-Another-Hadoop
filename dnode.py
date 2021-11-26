@@ -3,10 +3,16 @@ import os
 import sys
 import json
 from datetime import datetime
-
-
+from main import datanode
+import namenode
 files_json = {}
-datanode = {}
+
+
+
+def update_logs(dnode,block,dnode_logfile_path,operation):
+    with open(f'{dnode_logfile_path}{dnode}_datanode_log.txt',"a+") as logfile:
+        if(operation=='put'):
+            logfile.write(f"Block {block} has been occupied, {datetime.now()} \n")
 
 
 def hashing(file_block_no, num_of_datanodes):
@@ -40,34 +46,7 @@ def hashing(file_block_no, num_of_datanodes):
         else:
             return -1
 
-
-def create_datanode(num_datanodes, datanode_size, Datanode_path):
-    for dnode in range(1, num_datanodes+1):
-        os.makedirs(Datanode_path+str(dnode)+"_data_node")
-        datanode[dnode] = datanode_size
-	
-
-def create_namenode(Namenode_path):
-	os.makedirs(Namenode_path)
-	primary_json = {}
-	with open(Namenode_path+'primary.json', 'w') as primary:
-		json.dump(primary_json, primary)
-
-def create_datanode_logfiles(logfile_path,num_datanodes):
-    os.mkdir(logfile_path)
-    for dnode in range(1, num_datanodes+1):
-        with open(f'{logfile_path}{dnode}_datanode_log.txt',"w+") as logfile:
-            logfile.write(f"Datanode {dnode} has been created, {datetime.now()}\n")
-        logfile.close()
-
-
-def update_logs(dnode,block,dnode_logfile_path,operation):
-    with open(f'{dnode_logfile_path}{dnode}_datanode_log.txt',"a+") as logfile:
-        if(operation=='put'):
-            logfile.write(f"Block {block} has been occupied, {datetime.now()} \n")
-
-
-def initial_split(filename,block_size,datanode_size,num_datanodes,path_datanode,Namenode_path,logfile_path):
+def initial_split(filename,block_size,datanode_size,num_datanodes,path_datanode,Namenode_path,logfile_path,namenode_logfile_path):
         with open(filename, 'rb') as bytefile:
             ext = filename.split('.')[1]
             block_size = block_size * 1024 * 1024
@@ -94,13 +73,14 @@ def initial_split(filename,block_size,datanode_size,num_datanodes,path_datanode,
                     datanode[hash_value] -= 1
                     fh.write(content[i: i + block_size])
                     update_logs(hash_value,dnode_block,logfile_path,'put')
+                    namenode.update_namenode_logfile(namenode_logfile_path,hash_value,dnode_block,'put',num_datanodes)
                 fh.close()
             bytefile.close()
         with open(Namenode_path+'primary.json', 'w') as primary:
             json.dump(files_json, primary)
 
 
-def replicate_files(filename,block_size,datanode_size,num_datanodes,path_datanode,Namenode_path,replication_factor,logfile_path):
+def replicate_files(filename,block_size,datanode_size,num_datanodes,path_datanode,Namenode_path,replication_factor,logfile_path,namenode_logfile_path):
     remaining_blocks = 0
     ext = filename.split('.')[1]
     block_size = block_size * 1024 * 1024
@@ -127,17 +107,8 @@ def replicate_files(filename,block_size,datanode_size,num_datanodes,path_datanod
                     datanode[next_dnode]-=1
                     fh.write(content[i: i + block_size])
                     update_logs(next_dnode,next_dnode_block,logfile_path,'put')
+                    namenode.update_namenode_logfile(namenode_logfile_path,next_dnode,next_dnode_block,'put',num_datanodes)
                 fh.close()
         bytefile.close()
     with open(Namenode_path+'primary.json', 'w') as primary:
             json.dump(files_json, primary)
-    
-    
-
-
-
-
-            
-
-
-

@@ -7,7 +7,7 @@
     "datanode_size": 10,
     "sync_period": 180,
     "datanode_log_path": "C:/Users/Shreyas/Desktop/Yet-Another-Hadoop/Datanodes/Datanode_logs/",
-    "namenode_log_path": "/home/$USER/NAMENODE/NAMENODE_LOG.txt",
+    "namenode_log_path": "C:/Users/Shreyas/Desktop/Yet-Another-Hadoop/Namenodes/Namenode_logs.txt",
     "namenode_checkpoints": "/home/$USER/NAMENODE/CHECKPOINTS/",
     "fs_path": "/home/$USER/DFS/FILE_SYSTEM/",
     "dfs_setup_config": "/home/$USER/DFS/setup.json"
