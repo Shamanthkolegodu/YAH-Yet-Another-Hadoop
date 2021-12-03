@@ -15,9 +15,11 @@ def create_datanode(num_datanodes, datanode_size, Datanode_path):
         os.makedirs(Datanode_path+str(dnode)+"_data_node")
         datanode[dnode] = datanode_size
 	
-def create_namenode(Namenode_path):
+def create_namenode(Namenode_path,fs_path):
 	os.makedirs(Namenode_path)
-	primary_json = {}
+	primary_json = {
+        fs_path:{}
+    }
 	with open(Namenode_path+'primary.json', 'w') as primary:
 		json.dump(primary_json, primary)
 

@@ -76,7 +76,7 @@ def initial_split(filename,block_size,datanode_size,num_datanodes,path_datanode,
                     namenode.update_namenode_logfile(namenode_logfile_path,hash_value,dnode_block,'put',num_datanodes)
                 fh.close()
             bytefile.close()
-        with open(Namenode_path+'primary.json', 'w') as primary:
+        with open(Namenode_path+'primary.json', 'a+') as primary:
             json.dump(files_json, primary)
 
 
