@@ -1,4 +1,0 @@
-Datanode 2 has been created, 2021-12-04 17:12:47.101977
-Block 1 has been occupied, 2021-12-04 17:12:56.725406 
-Block 2 has been occupied, 2021-12-04 17:12:56.773176 
-Block 3 has been occupied, 2021-12-04 17:12:56.914660 
