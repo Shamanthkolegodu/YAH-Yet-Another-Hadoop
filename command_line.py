@@ -1,5 +1,4 @@
 import json
-import helper
 import namenode
 import main
 import dnode
@@ -32,8 +31,11 @@ def put(command):
             print('No path specified')
             return None
         else:
-            dnode.initial_split(command[1],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"],glob_config['datanode_log_path'],glob_config['namenode_log_path'])
-            dnode.replicate_files(command[1],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"],glob_config["replication_factor"],glob_config['datanode_log_path'],glob_config['namenode_log_path'])
+            var = dnode.initial_split(command[2],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"],glob_config['datanode_log_path'],glob_config['namenode_log_path'],glob_config['fs_path'],command[1])
+            if(var==-1):
+                pass
+            else:
+                dnode.replicate_files(command[2],int(glob_config["block_size"]), glob_config["datanode_size"], glob_config["num_datanodes"],glob_config["path_to_datanodes"],glob_config["path_to_namenodes"],glob_config["replication_factor"],glob_config['datanode_log_path'],glob_config['namenode_log_path'],glob_config['fs_path'],command[1])
     except Exception as e:
         print(e)
         return None
