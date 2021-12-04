@@ -61,7 +61,7 @@ def initial_split(filename,block_size,datanode_size,num_datanodes,path_datanode,
             elif fs_path+file_path in intial_read:
                 print("File already exist")
                 return -1
-            primary.close()
+        primary.close()
         with open(filename, 'rb') as bytefile:
             ext = filename.split('.')[1]
             block_size = block_size * 1024 * 1024
@@ -98,6 +98,7 @@ def initial_split(filename,block_size,datanode_size,num_datanodes,path_datanode,
             primary.close()
         with open(Namenode_path+'primary.json', 'w') as primary:
             json.dump(content_to_write,primary)
+            primary.close()
 
 
 def replicate_files(filename,block_size,datanode_size,num_datanodes,path_datanode,Namenode_path,replication_factor,logfile_path,namenode_logfile_path,fs_path,file_path):
@@ -137,3 +138,4 @@ def replicate_files(filename,block_size,datanode_size,num_datanodes,path_datanod
         primary.close()
     with open(Namenode_path+'primary.json', 'w') as primary:
         json.dump(content_to_write,primary)
+        primary.close()

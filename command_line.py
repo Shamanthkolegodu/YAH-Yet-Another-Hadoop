@@ -62,6 +62,28 @@ def cat(command):
         print(e)
         return None
 
+def ls(command):
+    try:
+        if(len(command) < 2):
+            print('No path specified')
+            return None
+        else:
+            namenode.ls(glob_config["path_to_namenodes"],glob_config["fs_path"],command[1])
+    except Exception as e:
+        print(e)
+        return None
+
+def rm(command):
+    try:
+        if(len(command) < 2):
+            print('No path specified')
+            return None
+        else:
+            namenode.rm(glob_config["path_to_namenodes"],glob_config["path_to_datanodes"],glob_config["fs_path"],command[1])
+    except Exception as e:
+        print(e)
+        return None
+
 
 print('Entering Hadoop Terminal')
 while(alive):
@@ -89,6 +111,14 @@ while(alive):
 
             # cat operation
             elif(command[1] == 'cat'):
-                mkdir(command[1:])
+                cat(command[1:])
+            
+            # ls operation
+            elif(command[1] == 'ls'):
+                ls(command[1:])
+
+            # rm operation
+            elif(command[1] == 'rm'):
+                rm(command[1:])
     except:
         pass
