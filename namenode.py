@@ -98,18 +98,15 @@ def rm(namenode_path,datanode_path,fs_path,file_path):
             print("File does not exist")
         else:
             file_dict = content_rm[check_path]
-            # print(file_dict)
             n = len(file_dict)
             for i in range(1,n+1):
                 empty_list = []
                 cur_dict = file_dict[str(i)]
-                # print(cur_dict)
                 for key,value in file_dict[str(i)].items():
                     empty_list.append((key,value))
                 for k in empty_list:
                     dnode_number = k[0]
                     dnode_block = k[1]
-                    # print(dnode_number,dnode_block)
                     content_tracker[str(dnode_number)][str(dnode_block)] = 0
                     content_tracker[str(dnode_number)]["count"] += 1
                     with open(namenode_path+'dnode_tracker.json', 'w') as trackers:
@@ -124,6 +121,56 @@ def rm(namenode_path,datanode_path,fs_path,file_path):
             with open(namenode_path+'dnode_tracker.json', 'w') as trackers:
                 json.dump(content_tracker,trackers)
                 trackers.close()
+    primary.close()
+
+
+
+def rmdir(namenode_path,datanode_path,fs_path,directory_path):
+    check_path = fs_path + directory_path + '/'
+    global content_rmdir
+    with open(os.path.join(namenode_path , 'primary.json')) as primary:
+        content_rmdir = json.loads(primary.read())
+        primary.close()
+    if check_path not in content_rmdir:
+        print("Directory doesnt exist")
+    else:
+        fspath_len=len(fs_path.split('/')[:-1])
+        check_path_splits = check_path.split('/')
+        if(check_path_splits[-1] == ''):
+            check_path_splits = check_path_splits[:-1]
+        n = len(check_path_splits)
+        file = []
+        folder = []
+
+        for key,value in content_rmdir.items():
+            answer = key.split('/')
+            if(answer[-1] == ''):
+                answer = answer[:-1]
+            if(answer[:n]==check_path_splits and len(answer)>=n):
+                if len(answer[-1].split('.'))>1:
+                    path_file=answer[fspath_len:]
+                    path_file='/'.join(path_file)
+                    file.append(path_file)
+                else:
+                    folder.append(key)
+        if(len(file)>0):
+            for item in file:
+                rm(namenode_path,datanode_path,fs_path,item)
+        global read_content
+        with open(os.path.join(namenode_path , 'primary.json')) as primary:
+            read_content = json.loads(primary.read())
+            primary.close()
+        if(len(folder)>0):
+            for item in folder:
+                read_content.pop(item)
+        with open(namenode_path+'primary.json', 'w') as primary_of:
+            json.dump(read_content,primary_of)
+            primary_of.close()
+                        
+                        
+            
+
+
 
                 
 

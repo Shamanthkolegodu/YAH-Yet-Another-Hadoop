@@ -192,14 +192,11 @@ def replicate_files(filename,block_size,datanode_size,num_datanodes,path_datanod
             cur_node = key
             cur_block = value
             break
-        # print(cur_node,cur_block)
         with open(f'{path_datanode}/{cur_node}' + '_data_node/' + str(cur_block) + '.'+ext, 'rb') as bytefile:
             for file_block_replica in range(1,can_replicate+1):
-                # print("hi")
                 dnode,block = replicaiton_hashing(file_block,num_datanodes,Namenode_path,datanode_size,fs_path,file_path,cur_node,cur_block)
-                # print(dnode,block)
                 if(dnode==-2):
-                    print("cannot replicate file block f'{file_block}' since the original file block is also on the same data node")
+                    print(f'cannot replicate file block {file_block+1} since the original file block is also on the same data node')
                 else:
                     with open(f'{path_datanode}/{dnode}' + '_data_node/' + str(block) + '.'+ext, 'wb') as fh:
                         files_json[fs_path+file_path][file_block+1][dnode] = block

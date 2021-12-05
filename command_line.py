@@ -86,6 +86,18 @@ def rm(command):
         return None
 
 
+def rmdir(command):
+    try:
+        if(len(command) < 2):
+            print('No path specified')
+            return None
+        else:
+            namenode.rmdir(glob_config["path_to_namenodes"],glob_config["path_to_datanodes"],glob_config["fs_path"],command[1])
+    except Exception as e:
+        print(e)
+        return None
+
+
 print('Entering Hadoop Terminal')
 while(alive):
     try:
@@ -121,5 +133,9 @@ while(alive):
             # rm operation
             elif(command[1] == 'rm'):
                 rm(command[1:])
+
+            # rmdir operation
+            elif(command[1] == 'rmdir'):
+                rmdir(command[1:])
     except:
         pass
