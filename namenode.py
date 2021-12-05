@@ -84,8 +84,50 @@ def ls(namenode_path,fs_path,directory_path):
                     print(i)
 
 
-# def rm(namenode_path,datanode_path,fs_path,file_path):
-#     check_path = fs_path + file_path
+def rm(namenode_path,datanode_path,fs_path,file_path):
+    check_path = fs_path + file_path
+    extensions = file_path.split('.')[-1]
+    global content_rm
+    global content_tracker
+    with open(os.path.join(namenode_path , 'dnode_tracker.json')) as tracks:
+        content_tracker = json.loads(tracks.read())
+        tracks.close()
+    with open(os.path.join(namenode_path , 'primary.json')) as primary:
+        content_rm = json.loads(primary.read())
+        if check_path not in content_rm:
+            print("File does not exist")
+        else:
+            file_dict = content_rm[check_path]
+            # print(file_dict)
+            n = len(file_dict)
+            for i in range(1,n+1):
+                empty_list = []
+                cur_dict = file_dict[str(i)]
+                # print(cur_dict)
+                for key,value in file_dict[str(i)].items():
+                    empty_list.append((key,value))
+                for k in empty_list:
+                    dnode_number = k[0]
+                    dnode_block = k[1]
+                    # print(dnode_number,dnode_block)
+                    content_tracker[str(dnode_number)][str(dnode_block)] = 0
+                    content_tracker[str(dnode_number)]["count"] += 1
+                    with open(namenode_path+'dnode_tracker.json', 'w') as trackers:
+                        json.dump(content_tracker,trackers)
+                        trackers.close() 
+                    del_path = datanode_path + str(dnode_number) + "_data_node/" + str(dnode_block) + '.' + extensions
+                    os.remove(del_path)
+            content_rm.pop(check_path)
+            with open(namenode_path+'primary.json', 'w') as primary_of:
+                json.dump(content_rm,primary_of)
+                primary_of.close()
+            with open(namenode_path+'dnode_tracker.json', 'w') as trackers:
+                json.dump(content_tracker,trackers)
+                trackers.close()
+
+                
+
+
             
     
 

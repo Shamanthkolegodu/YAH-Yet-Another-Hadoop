@@ -20,6 +20,7 @@ def hadoop_config(command):
             main.create_namenode(glob_config['path_to_namenodes'],glob_config['fs_path'])
             main.create_datanode_logfiles(glob_config['datanode_log_path'],glob_config['num_datanodes'])
             main.create_namenode_logfiles(glob_config['namenode_log_path'],glob_config['num_datanodes'])
+            main.create_datanode_tracker(glob_config['path_to_namenodes'],glob_config['num_datanodes'],glob_config['path_to_datanodes'],glob_config['datanode_size'])
     except Exception as e:
         print(e)
         return None

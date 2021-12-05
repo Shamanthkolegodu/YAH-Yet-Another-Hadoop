@@ -10,10 +10,12 @@ files_json = {}
 datanode = {}
 
 
-def create_datanode(num_datanodes, datanode_size, Datanode_path):
+def create_datanode(num_datanodes, datanode_size, datanode_path):
+    datanode_dict = {}
     for dnode in range(1, num_datanodes+1):
-        os.makedirs(Datanode_path+str(dnode)+"_data_node")
+        os.makedirs(datanode_path+str(dnode)+"_data_node")
         datanode[dnode] = datanode_size
+    
 	
 def create_namenode(Namenode_path,fs_path):
 	os.makedirs(Namenode_path)
@@ -35,3 +37,14 @@ def create_namenode_logfiles(logfile_path,num_datanodes):
         for i in range(1,num_datanodes+1):
             logfile.write(f"Datanode {i} has been created , {datetime.now()}\n")
     logfile.close()
+
+def create_datanode_tracker(namenode_path,num_datanodes,datanode_path,datanode_size):
+    datanode_dict = {}
+    for dnode in range(1, num_datanodes+1):
+        datanode_dict[str(dnode)] = {}
+        for i in range(1,datanode_size+1):
+            datanode_dict[str(dnode)][str(i)] = 0
+        datanode_dict[str(dnode)]["count"] = datanode_size
+    with open(namenode_path + "dnode_tracker.json" , "w") as dnode_track:
+        json.dump(datanode_dict,dnode_track)
+        dnode_track.close()
