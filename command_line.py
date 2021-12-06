@@ -4,30 +4,47 @@ import main
 import dnode
 import hadoop_mapreduce
 import subprocess
+import os
 alive = 1
 glob_config={}
 
 def hadoop_config(command):
     global glob_config
     try:
+        config_path=command[1]
+        logs = open(config_path)
+        glob_config = json.load(logs)
+        dfs_setup_config_path=glob_config['dfs_setup_config']+'setup_config.json'
+
         if(len(command) < 2):
             print('No path specified')
             return None
         else:
-            config_path = command[1]
-            logs = open(command[1])
-            glob_config = json.load(logs)
-            main.create_datanode(
-                glob_config['num_datanodes'], glob_config['datanode_size'], glob_config['path_to_datanodes'])
-            main.create_namenode(glob_config['path_to_namenodes'],glob_config['fs_path'],glob_config['namenode_checkpoints'])
-            main.create_datanode_logfiles(glob_config['datanode_log_path'],glob_config['num_datanodes'])
-            main.create_namenode_logfiles(glob_config['namenode_log_path'],glob_config['num_datanodes'])
-            main.create_datanode_tracker(glob_config['path_to_namenodes'],glob_config['num_datanodes'],glob_config['path_to_datanodes'],glob_config['datanode_size'])
-            subprocess.Popen(["python","heart.py",glob_config['path_to_namenodes'],glob_config['namenode_checkpoints']])
+            try:
+                with open(dfs_setup_config_path) as dfs_setup:
+                    dfs_setup.close()
+                 
+                with open(dfs_setup_config_path) as dfs_setup:
+                    glob_config = json.loads(dfs_setup.read())
+                    dfs_setup.close()
+
+            except:
+                config_path = command[1]
+                main.create_datanode(
+                    glob_config['num_datanodes'], glob_config['datanode_size'], glob_config['path_to_datanodes'])
+                main.create_namenode(glob_config['path_to_namenodes'],glob_config['fs_path'],glob_config['namenode_checkpoints'])
+                main.create_datanode_logfiles(glob_config['datanode_log_path'],glob_config['num_datanodes'])
+                main.create_namenode_logfiles(glob_config['namenode_log_path'],glob_config['num_datanodes'])
+                main.create_datanode_tracker(glob_config['path_to_namenodes'],glob_config['num_datanodes'],glob_config['path_to_datanodes'],glob_config['datanode_size'])
+                subprocess.Popen(["python","heart.py",glob_config['path_to_namenodes'],glob_config['namenode_checkpoints'],str(glob_config['sync_period'])])
+                os.makedirs(glob_config['dfs_setup_config'])
+                with open(dfs_setup_config_path,'w') as dfs_setup:
+                    json.dump(glob_config,dfs_setup)
+                    dfs_setup.close()
+
     except Exception as e:
         print(e)
-        return None
-
+        pass
 
 def put(command):
     try:
