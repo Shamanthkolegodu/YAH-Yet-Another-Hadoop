@@ -31,6 +31,10 @@ def update_namenode_logfile(logfile_path,dnode,block,operation,num_of_datanodes,
 def mkdir(namenode_path,fs_path,directory_name):
     arrays = directory_name.split('/')
     path ='/'.join(arrays[:-1])
+    intial_check = (fs_path + directory_name).split('.')
+    if(len(intial_check)>=2):
+        print("its not a directory")
+        return
     if len(path)==0:
         check_path = fs_path + path
     else:
@@ -53,32 +57,50 @@ def mkdir(namenode_path,fs_path,directory_name):
 
 def cat(namenode_path,datanode_path,fs_path,file_path,namenode_logfile_path,datanode_logfile_path,num_of_datanodes,flag):
     extensions = file_path.split('.')[-1]
+    name = file_path.split('/')[-1]
     check_path = fs_path + file_path
     global content_cat
+    global json_reader
+    json_reader = {}
     with open(os.path.join(namenode_path , 'primary.json')) as primary:
         content_cat = json.loads(primary.read())
         if(check_path not in content_cat):
             print("File not found")
         else:
+            if(extensions=='json'):
+                with open(os.path.join(namenode_path , 'hadoop_jobs.json') , "w") as reader:
+                    json.dump(json_reader, reader)
+                    reader.close()
+            with open(os.path.join(namenode_path ,'hadoop_'+name),"w") as primary:
+                    primary.write("")
+                    primary.close()
+            result = ""
             current_dict = content_cat[check_path]
             for i in range(1,len(current_dict)+1):
                 empty_list = []
-                final_cat=""
+                
                 for key,value in current_dict[str(i)].items():
                     empty_list.append((key,value))
-                    data_node = empty_list[0][0]
-                    data_node_block = empty_list[0][1]
-                    update_namenode_logfile(namenode_logfile_path,data_node,data_node_block,"cat",num_of_datanodes,namenode_path)
-                    dnode.update_datanode_logs(data_node,data_node_block,datanode_logfile_path,"cat")
-                    final_path = datanode_path + str(data_node) + '_data_node/' + str(data_node_block) + '.' + extensions
+                    break
+                data_node = empty_list[0][0]
+                data_node_block = empty_list[0][1]
+                update_namenode_logfile(namenode_logfile_path,data_node,data_node_block,"cat",num_of_datanodes,namenode_path)
+                dnode.update_datanode_logs(data_node,data_node_block,datanode_logfile_path,"cat")
+                final_path = datanode_path + str(data_node) + '_data_node/' + str(data_node_block) + '.' + extensions
+                if(extensions=='json'):
+                    with open(final_path , 'r') as primary:
+                        content = json.loads(primary.read())
+                        json_reader.dump(content)
+                        primary.close()
+                else:
                     with open(final_path,"r") as file_read:
                         content_to_display = file_read.read()
-                        final_cat+=content_to_display
+                        with open(os.path.join(namenode_path ,'hadoop_'+name),"a") as primary:
+                            primary.writelines(content_to_display)
+                            primary.close()
                         if(flag==0):
                             print(content_to_display,end="")
                         file_read.close()
-            if(flag==1):
-                return final_cat
             print("\n")
 
 def ls(namenode_path,fs_path,directory_path):

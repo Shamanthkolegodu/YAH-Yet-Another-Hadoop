@@ -17,13 +17,24 @@ def create_datanode(num_datanodes, datanode_size, datanode_path):
         datanode[dnode] = datanode_size
     
 	
-def create_namenode(Namenode_path,fs_path):
-	os.makedirs(Namenode_path)
-	primary_json = {
+def create_namenode(Namenode_path,fs_path,namenode_checkpoints):
+    os.makedirs(Namenode_path)
+    os.makedirs(namenode_checkpoints)
+
+    primary_json = {
         fs_path:{}
     }
-	with open(Namenode_path+'primary.json', 'w') as primary:
-		json.dump(primary_json, primary)
+    with open(Namenode_path+'primary.json', 'w') as primary:
+        json.dump(primary_json, primary)
+        primary.close()
+        
+    with open(Namenode_path+'secondary.json', 'w') as secondary:
+        json.dump(primary_json, secondary)
+        secondary.close()
+    
+    with open(namenode_checkpoints+'Checkpoints.txt','w') as ch_pt:
+        ch_pt.write("!-------CHECKPOINTS INITIATED-------!\n\n\n")
+        ch_pt.close()
 
 def create_datanode_logfiles(logfile_path,num_datanodes):
     os.mkdir(logfile_path)

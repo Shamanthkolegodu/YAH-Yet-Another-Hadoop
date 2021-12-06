@@ -3,8 +3,7 @@ import namenode
 import main
 import dnode
 import hadoop_mapreduce
-
-
+import subprocess
 alive = 1
 glob_config={}
 
@@ -15,14 +14,16 @@ def hadoop_config(command):
             print('No path specified')
             return None
         else:
+            config_path = command[1]
             logs = open(command[1])
             glob_config = json.load(logs)
             main.create_datanode(
                 glob_config['num_datanodes'], glob_config['datanode_size'], glob_config['path_to_datanodes'])
-            main.create_namenode(glob_config['path_to_namenodes'],glob_config['fs_path'])
+            main.create_namenode(glob_config['path_to_namenodes'],glob_config['fs_path'],glob_config['namenode_checkpoints'])
             main.create_datanode_logfiles(glob_config['datanode_log_path'],glob_config['num_datanodes'])
             main.create_namenode_logfiles(glob_config['namenode_log_path'],glob_config['num_datanodes'])
             main.create_datanode_tracker(glob_config['path_to_namenodes'],glob_config['num_datanodes'],glob_config['path_to_datanodes'],glob_config['datanode_size'])
+            subprocess.Popen(["python","heart.py",glob_config['path_to_namenodes'],glob_config['namenode_checkpoints']])
     except Exception as e:
         print(e)
         return None
@@ -117,9 +118,8 @@ while(alive):
         command = input('>')
         command = command.split()
         # print(command)
-        if(command[0] == '0'):
+        if(command[0] == 'exit'):
             alive = 0
-
         else:
             # hadoop config config.js
             if(command[1] == 'config'):
