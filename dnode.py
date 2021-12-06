@@ -9,10 +9,14 @@ files_json = {}
 
 
 
-def update_logs(dnode,block,dnode_logfile_path,operation):
+def update_datanode_logs(dnode,block,dnode_logfile_path,operation):
     with open(f'{dnode_logfile_path}{dnode}_datanode_log.txt',"a+") as logfile:
         if(operation=='put'):
             logfile.write(f"Block {block} has been occupied, {datetime.now()} \n")
+        if(operation=='rm'):
+            logfile.write(f"Block {block} has been removed, {datetime.now()} \n")
+        if(operation=="cat"):
+            logfile.write(f"Block {block} contents have been read and displayed, {datetime.now()} \n")
 
 
 def hashing(file_block_no,num_of_datanodes,namenode_path,datanode_size):
@@ -96,9 +100,6 @@ def replicaiton_hashing(file_block,num_of_datanodes,namenode_path,datanode_size,
 
     
         
-
-
-
 def initial_split(filename,block_size,datanode_size,num_datanodes,path_datanode,Namenode_path,logfile_path,namenode_logfile_path,fs_path,file_path):
         splits = file_path.split('/')
         path ='/'.join(splits[:-1])
@@ -147,8 +148,8 @@ def initial_split(filename,block_size,datanode_size,num_datanodes,path_datanode,
                         json.dump(dnode_tracks,secondary)
                         secondary.close()
                     fh.write(content[i: i + block_size])
-                    update_logs(dnode,block,logfile_path,'put')
-                    namenode.update_namenode_logfile(namenode_logfile_path,dnode,block,'put',num_datanodes)
+                    update_datanode_logs(dnode,block,logfile_path,'put')
+                    namenode.update_namenode_logfile(namenode_logfile_path,dnode,block,'put',num_datanodes,Namenode_path)
                 fh.close()
             bytefile.close()
         global content_to_write
@@ -206,8 +207,8 @@ def replicate_files(filename,block_size,datanode_size,num_datanodes,path_datanod
                             json.dump(dnode_tracks,secondary)
                             secondary.close()
                         fh.write(content[i: i + block_size])
-                        update_logs(dnode,block,logfile_path,'put')
-                        namenode.update_namenode_logfile(namenode_logfile_path,dnode,block,'put',num_datanodes)
+                        update_datanode_logs(dnode,block,logfile_path,'put')
+                        namenode.update_namenode_logfile(namenode_logfile_path,dnode,block,'put',num_datanodes,Namenode_path)
                     fh.close()
         bytefile.close()    
     with open(os.path.join(Namenode_path , 'primary.json')) as primary:

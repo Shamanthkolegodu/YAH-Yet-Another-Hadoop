@@ -2,6 +2,8 @@ import json
 import namenode
 import main
 import dnode
+import hadoop_mapreduce
+
 
 alive = 1
 glob_config={}
@@ -58,7 +60,7 @@ def cat(command):
             print('No path specified')
             return None
         else:
-            namenode.cat(glob_config["path_to_namenodes"],glob_config["path_to_datanodes"],glob_config["fs_path"],command[1])
+            namenode.cat(glob_config["path_to_namenodes"],glob_config["path_to_datanodes"],glob_config["fs_path"],command[1],glob_config["namenode_log_path"],glob_config["datanode_log_path"],glob_config["num_datanodes"],0)
     except Exception as e:
         print(e)
         return None
@@ -80,7 +82,7 @@ def rm(command):
             print('No path specified')
             return None
         else:
-            namenode.rm(glob_config["path_to_namenodes"],glob_config["path_to_datanodes"],glob_config["fs_path"],command[1])
+            namenode.rm(glob_config["path_to_namenodes"],glob_config["path_to_datanodes"],glob_config["fs_path"],command[1],glob_config["datanode_log_path"],glob_config["namenode_log_path"],glob_config["num_datanodes"])
     except Exception as e:
         print(e)
         return None
@@ -93,6 +95,17 @@ def rmdir(command):
             return None
         else:
             namenode.rmdir(glob_config["path_to_namenodes"],glob_config["path_to_datanodes"],glob_config["fs_path"],command[1])
+    except Exception as e:
+        print(e)
+        return None
+
+def mapreduce(command):
+    try:
+        if(len(command) < 2):
+            print('No path specified')
+            return None
+        else:
+            hadoop_mapreduce.map_reducer(command[1],command[2],command[4],glob_config["fs_path"],command[3],glob_config["path_to_namenodes"],glob_config["path_to_datanodes"],glob_config["namenode_log_path"],glob_config["datanode_log_path"],glob_config["num_datanodes"])
     except Exception as e:
         print(e)
         return None
@@ -137,5 +150,9 @@ while(alive):
             # rmdir operation
             elif(command[1] == 'rmdir'):
                 rmdir(command[1:])
+            
+            # hadoop map reduce
+            elif(command[1] == 'mapreduce'):
+                mapreduce(command[1:])
     except:
         pass

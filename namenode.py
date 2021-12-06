@@ -3,13 +3,29 @@ import os
 import sys
 import json
 from datetime import datetime
-from dnode import datanode 
-def update_namenode_logfile(logfile_path,dnode,block,operation,num_of_datanodes):
+from dnode import datanode
+import dnode
+
+def update_namenode_logfile(logfile_path,dnode,block,operation,num_of_datanodes,namenode_path):
     with open(f'{logfile_path}',"a+") as logfile:
         if(operation=='put'):
             logfile.write(f"Datanode {dnode}'s Block {block} has been occupied, {datetime.now()} \n")
             for i in range(1,num_of_datanodes+1):
-                logfile.write(f"Remaining Blocks in datanode {i} : {datanode[i]} , {datetime.now()} \n")
+                with open(os.path.join(namenode_path , 'dnode_tracker.json')) as primary:
+                    track_reader = json.loads(primary.read())
+                    params = track_reader[str(i)]["count"]
+                    logfile.write(f"Remaining Blocks in datanode {i} : {params} , {datetime.now()} \n")
+                primary.close()
+        if(operation=='rm'):
+            logfile.write(f"Datanode {dnode}'s Block {block} has been removed, {datetime.now()} \n")
+            for i in range(1,num_of_datanodes+1):
+                with open(os.path.join(namenode_path , 'dnode_tracker.json')) as primary:
+                    track_reader = json.loads(primary.read())
+                    params = track_reader[str(i)]["count"]
+                    logfile.write(f"Remaining Blocks in datanode {i} : {params} , {datetime.now()} \n")
+                primary.close()
+        if(operation=='cat'):
+            logfile.write(f"Datanode {dnode}'s Block {block} content has been read and displayed, {datetime.now()} \n")
     logfile.close()
 
 def mkdir(namenode_path,fs_path,directory_name):
@@ -35,7 +51,7 @@ def mkdir(namenode_path,fs_path,directory_name):
         primary.close()
 
 
-def cat(namenode_path,datanode_path,fs_path,file_path):
+def cat(namenode_path,datanode_path,fs_path,file_path,namenode_logfile_path,datanode_logfile_path,num_of_datanodes,flag):
     extensions = file_path.split('.')[-1]
     check_path = fs_path + file_path
     global content_cat
@@ -47,15 +63,22 @@ def cat(namenode_path,datanode_path,fs_path,file_path):
             current_dict = content_cat[check_path]
             for i in range(1,len(current_dict)+1):
                 empty_list = []
+                final_cat=""
                 for key,value in current_dict[str(i)].items():
                     empty_list.append((key,value))
                     data_node = empty_list[0][0]
                     data_node_block = empty_list[0][1]
+                    update_namenode_logfile(namenode_logfile_path,data_node,data_node_block,"cat",num_of_datanodes,namenode_path)
+                    dnode.update_datanode_logs(data_node,data_node_block,datanode_logfile_path,"cat")
                     final_path = datanode_path + str(data_node) + '_data_node/' + str(data_node_block) + '.' + extensions
                     with open(final_path,"r") as file_read:
                         content_to_display = file_read.read()
-                        print(content_to_display,end="")
+                        final_cat+=content_to_display
+                        if(flag==0):
+                            print(content_to_display,end="")
                         file_read.close()
+            if(flag==1):
+                return final_cat
             print("\n")
 
 def ls(namenode_path,fs_path,directory_path):
@@ -84,7 +107,7 @@ def ls(namenode_path,fs_path,directory_path):
                     print(i)
 
 
-def rm(namenode_path,datanode_path,fs_path,file_path):
+def rm(namenode_path,datanode_path,fs_path,file_path,dnode_logfile_path,namenode_logfile_path,num_datanodes):
     check_path = fs_path + file_path
     extensions = file_path.split('.')[-1]
     global content_rm
@@ -109,6 +132,8 @@ def rm(namenode_path,datanode_path,fs_path,file_path):
                     dnode_block = k[1]
                     content_tracker[str(dnode_number)][str(dnode_block)] = 0
                     content_tracker[str(dnode_number)]["count"] += 1
+                    dnode.update_datanode_logs(dnode_number,dnode_block,dnode_logfile_path,'rm')
+                    update_namenode_logfile(namenode_logfile_path,dnode_number,dnode_block,'rm',num_datanodes,namenode_path)
                     with open(namenode_path+'dnode_tracker.json', 'w') as trackers:
                         json.dump(content_tracker,trackers)
                         trackers.close() 
