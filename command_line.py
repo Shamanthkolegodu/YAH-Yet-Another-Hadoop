@@ -36,7 +36,7 @@ def hadoop_config(command):
                 main.create_datanode_logfiles(glob_config['datanode_log_path'],glob_config['num_datanodes'])
                 main.create_namenode_logfiles(glob_config['namenode_log_path'],glob_config['num_datanodes'])
                 main.create_datanode_tracker(glob_config['path_to_namenodes'],glob_config['num_datanodes'],glob_config['path_to_datanodes'],glob_config['datanode_size'])
-                subprocess.Popen(["python","heart.py",glob_config['path_to_namenodes'],glob_config['namenode_checkpoints'],str(glob_config['sync_period'])])
+                subprocess.Popen(["python3","heart.py",glob_config['path_to_namenodes'],glob_config['namenode_checkpoints'],str(glob_config['sync_period'])])
                 os.makedirs(glob_config['dfs_setup_config'])
                 with open(dfs_setup_config_path,'w') as dfs_setup:
                     json.dump(glob_config,dfs_setup)
