@@ -72,7 +72,7 @@ The fs_path attribute stores the absolute path to a virtual directory where a us
 3. You need to pass this input through the cat command to your --mapper file, sort the output, feed that to your --reducer file and store the output in the --output directory.
 
 ## Team
-Shamanth K M
-Shreyas basri
-Sharat hegade
-Vibhav shiras
+1. Shamanth K M
+2. Shreyas basri
+3. Sharat hegade
+4. Vibhav shiras
